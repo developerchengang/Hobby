@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Hobby</string>
+    <string name="about">About</string>
+    <string name="about_body"><![CDATA[
+        Hobby by chengang<a href="https://github.com/developerchengang">chengang</a>.<br/>
+        <a href=\'https://github.com/developerchengang/Hobby\'>Hobby</a>
+    ]]></string>
+
+</resources>
