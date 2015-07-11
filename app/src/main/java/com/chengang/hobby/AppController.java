@@ -3,7 +3,7 @@ package com.chengang.hobby;
 import android.app.Application;
 
 /**
- * È«¾ÖÓ¦ÓÃ³ÌĞòÀà£ºÓÃÓÚ±£´æºÍµ÷ÓÃÈ«¾ÖÓ¦ÓÃÅäÖÃ¼°·ÃÎÊÍøÂçÊı¾İ
+ * È«å…¨å±€åº”ç”¨ç¨‹åºç±»ï¼šç”¨äºä¿å­˜å’Œè°ƒç”¨å…¨å±€åº”ç”¨é…ç½®åŠè®¿é—®ç½‘ç»œæ•°æ®
  *
  * @author chengang (https://github.com/developerchengang)
  * @version 1.0

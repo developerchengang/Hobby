@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import com.chengang.hobby.R;
 
 /**
- * 电影界面
+ * 鐢靛奖鐣岄潰
  *
  * @author chengang (https://github.com/developerchengang)
  * @version 1.0

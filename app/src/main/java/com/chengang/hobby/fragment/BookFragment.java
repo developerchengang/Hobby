@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import com.chengang.hobby.R;
 
 /**
- * Êé¼®½çÃæ
+ * ä¹¦ç±ç•Œé¢
  *
  * @author chengang (https://github.com/developerchengang)
  * @version 1.0
