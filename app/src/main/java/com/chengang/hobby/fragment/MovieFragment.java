@@ -69,9 +69,11 @@ public class MovieFragment extends BaseFragment implements
 
     private int lastVisibleItem;
 
+    private int mCurrentPage = 1;
+
     private int start;
 
-    private int count;
+    private final static int count = 20;
 
     String jsonString;
 
@@ -165,14 +167,10 @@ public class MovieFragment extends BaseFragment implements
                             result.setCount(jsonObject.getInt("count"));
                             result.setStart(jsonObject.getInt("start"));
                             result.setTotal(jsonObject.getInt("total"));
-                            start = result.getCount() + 1;
-                            count = result.getCount() + 20;
-                            Log.i("get",start+"");
-                            Log.i("get",count+"");
+                            start = result.getCount();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-
 
                         try {
                             listData = gson.fromJson(jsonObject.getString("subjects"), new TypeToken<List<Subjects>>() {
@@ -201,9 +199,10 @@ public class MovieFragment extends BaseFragment implements
      * Volley POST请求网络
      */
     private void postVolley(){
+
+        start = mCurrentPage * 20;
+
         Map<String, String> params = new HashMap<>();
-        Log.i("post",start+"");
-        Log.i("post",count+"");
         params.put("start", start+"");
         params.put("count", count+"");
         CustomRequest jsonObjReq  = new CustomRequest (
@@ -213,6 +212,8 @@ public class MovieFragment extends BaseFragment implements
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
+
+
                         Gson gson = new Gson();
                         jsonObject = response;
 
@@ -221,19 +222,20 @@ public class MovieFragment extends BaseFragment implements
                             result.setCount(jsonObject.getInt("count"));
                             result.setStart(jsonObject.getInt("start"));
                             result.setTotal(jsonObject.getInt("total"));
-                            start = result.getCount()+1;
-                            count = result.getCount() + 20;
+                            start = result.getCount();
 
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
 
                         try {
-                            listData = gson.fromJson(jsonObject.getString("subjects"), new TypeToken<List<Subjects>>() {
+
+                            List<Subjects> list = gson.fromJson(jsonObject.getString("subjects"), new TypeToken<List<Subjects>>() {
                             }.getType());
-                            if (listData != null){
-                                adapter = new MovieAdapter(getActivity(),listData);
-                                recyclerView.setAdapter(adapter);
+                            listData.addAll(list);
+                            if (listData != null && listData.size() > 0 && adapter != null){
+                                mCurrentPage ++;
+                                adapter.notifyDataSetChanged();
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
