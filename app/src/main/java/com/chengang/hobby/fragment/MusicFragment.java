@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.chengang.hobby.R;
+import com.chengang.hobby.basefragment.BaseFragment;
 
 /**
  * 音乐界面
@@ -16,7 +17,7 @@ import com.chengang.hobby.R;
  * @version 1.0
  * @created 2015-07-10
  */
-public class MusicFragment extends Fragment {
+public class MusicFragment extends BaseFragment {
 
     public static MusicFragment newInstance(){
         return new MusicFragment();

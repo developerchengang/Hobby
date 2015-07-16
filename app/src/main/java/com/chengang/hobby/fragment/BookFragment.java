@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.chengang.hobby.R;
+import com.chengang.hobby.basefragment.BaseFragment;
 
 /**
  * 书籍界面
@@ -16,7 +17,7 @@ import com.chengang.hobby.R;
  * @version 1.0
  * @created 2015-07-10
  */
-public class BookFragment extends Fragment{
+public class BookFragment extends BaseFragment{
 
     public static BookFragment newInstance(){
         return new BookFragment();
