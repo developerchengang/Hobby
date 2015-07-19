@@ -2,6 +2,7 @@ package com.chengang.hobby.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -82,7 +83,7 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     @Override
     public int getItemCount() {
-        return mListData.size();
+        return mListData.size() + 1;
     }
 
     class ItemViewHolder extends RecyclerView.ViewHolder {

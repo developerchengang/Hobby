@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.ContentLoadingProgressBar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -32,6 +33,7 @@ import com.google.gson.reflect.TypeToken;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,9 +49,8 @@ import butterknife.ButterKnife;
  * @created 2015-07-10
  */
 public class MovieFragment extends BaseFragment implements
-        SwipeRefreshLayout.OnRefreshListener{
+        SwipeRefreshLayout.OnRefreshListener {
 
-    public static final String TAG_GET_MOVIE = "json_get_movie";
     public static final String TAG_POST_MOVIE = "json_post_movie";
 
     @Bind(R.id.recycler_view)
@@ -57,9 +58,11 @@ public class MovieFragment extends BaseFragment implements
     @Bind(R.id.swipe_refresh_widget)
     SwipeRefreshLayout mSwipeRefreshLayout;
 
+    private ContentLoadingProgressBar progressBar;
+
     private LinearLayoutManager mLayoutManager;
 
-    private List<Subjects> listData;
+    private List<Subjects> listData = new ArrayList<>();
 
     private static String url;
 
@@ -69,32 +72,39 @@ public class MovieFragment extends BaseFragment implements
 
     private int lastVisibleItem;
 
-    private int mCurrentPage = 1;
+    private int mCurrentPage = 0;
+
+    protected int mLastPage = -1;
 
     private int start;
+
+    private View view;
 
     private final static int count = 20;
 
     String jsonString;
 
-    private Handler handler = new Handler(){
+    private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            switch (msg.what){
+            switch (msg.what) {
                 // 下拉刷新数据
                 case 0:
                     mSwipeRefreshLayout.setRefreshing(false);
-                    getVolley();
+                    mCurrentPage = 0;
+                    mLastPage = -1;
+                    getData();
                     break;
                 // 上拉加载数据
                 case 1:
-                    postVolley();
+                    getData();
                     break;
             }
         }
     };
-    public static MovieFragment newInstance(){
+
+    public static MovieFragment newInstance() {
         return new MovieFragment();
     }
 
@@ -107,8 +117,8 @@ public class MovieFragment extends BaseFragment implements
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.fragment_movie, container, false);
-        return root;
+        view = inflater.inflate(R.layout.fragment_movie, container, false);
+        return view;
     }
 
     @Override
@@ -127,7 +137,7 @@ public class MovieFragment extends BaseFragment implements
                 super.onScrollStateChanged(recyclerView, newState);
                 if (newState == RecyclerView.SCROLL_STATE_IDLE &&
                         lastVisibleItem + 1 == adapter.getItemCount()) {
-                    handler.sendEmptyMessageDelayed(1,3000);
+                    handler.sendEmptyMessageDelayed(1, 3000);
                 }
             }
 
@@ -143,69 +153,26 @@ public class MovieFragment extends BaseFragment implements
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        getVolley();
-
-
-    }
-
-    /**
-     * Volley GET请求网络
-     */
-    private void getVolley(){
-        JsonObjectRequest jsonObjReq  = new JsonObjectRequest(
-                Request.Method.GET,
-                url,
-                null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        Gson gson = new Gson();
-                        jsonObject = response;
-
-                        Result result = new Result();
-                        try {
-                            result.setCount(jsonObject.getInt("count"));
-                            result.setStart(jsonObject.getInt("start"));
-                            result.setTotal(jsonObject.getInt("total"));
-                            start = result.getCount();
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-
-                        try {
-                            listData = gson.fromJson(jsonObject.getString("subjects"), new TypeToken<List<Subjects>>() {
-                            }.getType());
-                            if (listData != null){
-                                adapter = new MovieAdapter(getActivity(),listData);
-                                recyclerView.setAdapter(adapter);
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-
-                    }
-                });
-        AppController.getInstance().addToRequestQueue(jsonObjReq, TAG_GET_MOVIE);
+        mCurrentPage = 0;
+        getData();
 
     }
 
-    /**
-     * Volley POST请求网络
-     */
-    private void postVolley(){
 
+    /**
+     * 获取网络数据
+     */
+    private void getData() {
+        if (mCurrentPage <= mLastPage) {
+            return;
+        }
+        mLastPage = mCurrentPage;
         start = mCurrentPage * 20;
-
+        Log.i(TAG_POST_MOVIE, start + "");
         Map<String, String> params = new HashMap<>();
-        params.put("start", start+"");
-        params.put("count", count+"");
-        CustomRequest jsonObjReq  = new CustomRequest (
+        params.put("start", start + "");
+        params.put("count", count + "");
+        CustomRequest jsonObjReq = new CustomRequest(
                 Request.Method.POST,
                 url,
                 params,
@@ -213,7 +180,6 @@ public class MovieFragment extends BaseFragment implements
                     @Override
                     public void onResponse(JSONObject response) {
 
-
                         Gson gson = new Gson();
                         jsonObject = response;
 
@@ -222,7 +188,6 @@ public class MovieFragment extends BaseFragment implements
                             result.setCount(jsonObject.getInt("count"));
                             result.setStart(jsonObject.getInt("start"));
                             result.setTotal(jsonObject.getInt("total"));
-                            start = result.getCount();
 
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -232,10 +197,33 @@ public class MovieFragment extends BaseFragment implements
 
                             List<Subjects> list = gson.fromJson(jsonObject.getString("subjects"), new TypeToken<List<Subjects>>() {
                             }.getType());
-                            listData.addAll(list);
-                            if (listData != null && listData.size() > 0 && adapter != null){
-                                mCurrentPage ++;
-                                adapter.notifyDataSetChanged();
+                            if (list != null) {
+
+                                if (mCurrentPage == 0) {
+                                    listData.clear();
+                                }
+                                listData.addAll(list);
+
+                                if (listData != null && listData.size() > 0 &&
+                                        adapter == null) {
+                                    adapter = new MovieAdapter(getActivity(), listData);
+                                    recyclerView.setAdapter(adapter);
+                                    mCurrentPage++;
+                                } else if (list.size() == 20 && adapter != null) {
+                                    adapter.notifyDataSetChanged();
+                                    mCurrentPage++;
+                                } else if ((list.size() < 20 && listData.size() > 0)
+                                        && adapter != null){
+                                    adapter.notifyDataSetChanged();
+                                }
+
+                                int size = list.size();
+                                if (size < 20) {
+                                    progressBar = (ContentLoadingProgressBar)
+                                            view.findViewById(R.id.progressbar);
+                                    progressBar.hide();
+                                }
+
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -254,7 +242,12 @@ public class MovieFragment extends BaseFragment implements
 
     @Override
     public void onRefresh() {
-        handler.sendEmptyMessageDelayed(0,3000);
+
+        if (progressBar != null){
+            progressBar.show();
+        }
+
+        handler.sendEmptyMessageDelayed(0, 3000);
     }
 
 }
