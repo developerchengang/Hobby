@@ -57,6 +57,8 @@ public class MovieFragment extends BaseFragment implements
     RecyclerView recyclerView;
     @Bind(R.id.swipe_refresh_widget)
     SwipeRefreshLayout mSwipeRefreshLayout;
+    @Bind(R.id.loadingprogressbar)
+    ContentLoadingProgressBar mLoadingprogressbar;
 
     private ContentLoadingProgressBar progressBar;
 
@@ -126,7 +128,7 @@ public class MovieFragment extends BaseFragment implements
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
 
-        mSwipeRefreshLayout.setColorSchemeColors(R.color.swiperefresh_color1,
+        mSwipeRefreshLayout.setColorSchemeResources(R.color.swiperefresh_color1,
                 R.color.swiperefresh_color2, R.color.swiperefresh_color3,
                 R.color.swiperefresh_color4);
         mSwipeRefreshLayout.setOnRefreshListener(this);
@@ -154,6 +156,7 @@ public class MovieFragment extends BaseFragment implements
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
         mCurrentPage = 0;
+        mLoadingprogressbar.show();
         getData();
 
     }
@@ -224,6 +227,8 @@ public class MovieFragment extends BaseFragment implements
                                     progressBar.hide();
                                 }
 
+                                mLoadingprogressbar.hide();
+
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -234,7 +239,8 @@ public class MovieFragment extends BaseFragment implements
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-
+                        progressBar.hide();
+                        mLoadingprogressbar.hide();
                     }
                 });
         AppController.getInstance().addToRequestQueue(jsonObjReq, TAG_POST_MOVIE);

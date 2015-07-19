@@ -1,6 +1,7 @@
 package com.chengang.hobby.adapter;
 
 import android.content.Context;
+import android.support.v4.widget.ContentLoadingProgressBar;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,6 +18,9 @@ import com.chengang.hobby.bean.RatingEntity;
 import com.chengang.hobby.bean.Subjects;
 
 import java.util.List;
+
+import butterknife.Bind;
+import butterknife.ButterKnife;
 
 /**
  * ȫ电影适配器
@@ -88,20 +92,15 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     class ItemViewHolder extends RecyclerView.ViewHolder {
 
-        public NetworkImageView mImageView;
-        public TextView mTitle;
-        public TextView mAverage;
-        public TextView mGenres;
-        public TextView mYear;
+        @Bind(R.id.movie_imageView) NetworkImageView mImageView;
+        @Bind(R.id.movie_title) TextView mTitle;
+        @Bind(R.id.movie_average) TextView mAverage;
+        @Bind(R.id.movie_genres) TextView mGenres;
+        @Bind(R.id.movie_year) TextView mYear;
 
         public ItemViewHolder(View itemView) {
             super(itemView);
-            mImageView = (NetworkImageView) itemView.findViewById(R.id.movie_imageView);
-            mTitle = (TextView) itemView.findViewById(R.id.movie_title);
-            mAverage = (TextView) itemView.findViewById(R.id.movie_average);
-            mGenres = (TextView) itemView.findViewById(R.id.movie_genres);
-            mYear = (TextView) itemView.findViewById(R.id.movie_year);
-
+            ButterKnife.bind(this, itemView);
         }
     }
 
